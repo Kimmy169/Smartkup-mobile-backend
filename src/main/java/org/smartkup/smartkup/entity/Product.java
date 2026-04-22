@@ -2,26 +2,23 @@ package org.smartkup.smartkup.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "Products")
-@Data // Automatically generates getters, setters, toString, and equals
-@NoArgsConstructor // Required by JPA
-@AllArgsConstructor
+@Data // This Lombok annotation is the magic that creates getName(), setName(), etc.
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long product_Id;
+    @Column(name = "product_id")
+    private Long productId;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "category_id")
     private Long categoryId;
 
-    @Column(name = "default_unit", length = 20)
+    @Column(name = "default_unit")
     private String defaultUnit;
 }

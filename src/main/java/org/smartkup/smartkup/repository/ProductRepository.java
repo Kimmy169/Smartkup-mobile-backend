@@ -2,12 +2,9 @@ package org.smartkup.smartkup.repository;
 
 import org.smartkup.smartkup.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-import java.util.List;
-
-@Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    // Custom query example
-    List<Product> findByNameContainingIgnoreCase(String name);
+    // Allows us to search if a product already exists by typing its name
+    Optional<Product> findByNameIgnoreCase(String name);
 }

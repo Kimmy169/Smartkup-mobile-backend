@@ -1,9 +1,9 @@
 package org.smartkup.smartkup.controller;
 
 import org.smartkup.smartkup.dto.ShoppingListResponseDTO;
-import org.smartkup.smartkup.entity.ShoppingList;
 import org.smartkup.smartkup.entity.ShoppingListItem;
 import org.smartkup.smartkup.service.ShoppingListService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,21 +16,36 @@ public class ShoppingListController {
         this.service = service;
     }
 
-    // Create a new list
-    @PostMapping
-    public ShoppingList createList(@RequestBody ShoppingList list) {
-        return service.createList(list);
-    }
-
-    // Add an item to a list
-    @PostMapping("/items")
-    public ShoppingListItem addItem(@RequestBody ShoppingListItem item) {
-        return service.addItemToList(item);
-    }
-
-    // Get the full list with all items
+    // 1. The GET endpoint (you already have this)
     @GetMapping("/{listId}")
-    public ShoppingListResponseDTO getFullList(@PathVariable Long listId) {
-        return service.getFullShoppingList(listId);
+    public ResponseEntity<ShoppingListResponseDTO> getFullList(@PathVariable Long listId) {
+        try {
+            ShoppingListResponseDTO response = service.getFullShoppingList(listId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // 2. THE MISSING POST ENDPOINT (Add this!)
+    @PostMapping("/items")
+    public ResponseEntity<ShoppingListItem> addItem(@RequestBody ShoppingListItem item) {
+        try {
+            ShoppingListItem savedItem = service.addItemToList(item);
+            return ResponseEntity.ok(savedItem);
+        } catch (IllegalArgumentException e) {
+            System.out.println("--- BAD REQUEST ERROR ---");
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            System.out.println("--- DATABASE SAVE ERROR ---");
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    @PutMapping("/items/{itemId}/toggle")
+    public ResponseEntity<Void> toggleItemStatus(@PathVariable Long itemId, @RequestParam Boolean isPurchased) {
+        service.toggleItemStatus(itemId, isPurchased);
+        return ResponseEntity.ok().build();
     }
 }
