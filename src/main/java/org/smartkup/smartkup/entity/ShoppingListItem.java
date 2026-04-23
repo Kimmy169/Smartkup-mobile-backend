@@ -32,4 +32,11 @@ public class ShoppingListItem {
 
     @Transient
     private String productName;
+
+    @Transient
+    @com.fasterxml.jackson.annotation.JsonProperty("categoryId") // This forces Jackson to map it correctly
+    private Long categoryId;
+
+    @Transient
+    private java.math.BigDecimal productPrice;
 }

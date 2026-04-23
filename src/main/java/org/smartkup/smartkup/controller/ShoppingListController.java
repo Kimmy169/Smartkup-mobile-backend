@@ -1,10 +1,13 @@
 package org.smartkup.smartkup.controller;
 
 import org.smartkup.smartkup.dto.ShoppingListResponseDTO;
+import org.smartkup.smartkup.entity.ShoppingList;
 import org.smartkup.smartkup.entity.ShoppingListItem;
 import org.smartkup.smartkup.service.ShoppingListService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/shopping-lists")
@@ -43,9 +46,21 @@ public class ShoppingListController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
     @PutMapping("/items/{itemId}/toggle")
     public ResponseEntity<Void> toggleItemStatus(@PathVariable Long itemId, @RequestParam Boolean isPurchased) {
         service.toggleItemStatus(itemId, isPurchased);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ShoppingList>> getAllLists() {
+        return ResponseEntity.ok(service.getAllLists());
+    }
+
+    // Handles POST /api/shopping-lists
+    @PostMapping
+    public ResponseEntity<ShoppingList> createList(@RequestBody ShoppingList list) {
+        return ResponseEntity.ok(service.createList(list));
     }
 }

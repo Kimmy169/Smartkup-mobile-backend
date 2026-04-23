@@ -27,71 +27,100 @@ public class ShoppingListService {
         this.productRepository = productRepository;
     }
 
-    // --- THE UPGRADED ADD METHOD ---
+    /**
+     * Adds an item to a list. If the product is new, it creates it.
+     * It also updates the global price in the Products table.
+     */
     public ShoppingListItem addItemToList(ShoppingListItem item) {
-
+        // Reset ID if it comes as 0 from Android to allow auto-generation
         if (item.getList_item_id() != null && item.getList_item_id() == 0L) {
             item.setList_item_id(null);
         }
 
-        // 1. Did the user type a custom product name instead of picking from the list?
+        // 1. Resolve the Product (Create if custom name was typed)
         if (item.getProductId() == null || item.getProductId() == 0L) {
-
             String customName = item.getProductName();
             if (customName == null || customName.trim().isEmpty()) {
                 throw new IllegalArgumentException("Product name cannot be empty for new products!");
             }
 
-            // 2. Check if it actually exists in the DB already (maybe they typed it perfectly)
             Optional<Product> existingProduct = productRepository.findByNameIgnoreCase(customName.trim());
 
             if (existingProduct.isPresent()) {
-                // It exists! Just use the real ID.
                 item.setProductId(existingProduct.get().getProductId());
             } else {
-                // 3. It's truly new. Create it in the Products table!
                 Product newProduct = new Product();
                 newProduct.setName(customName.trim());
                 newProduct.setDefaultUnit(item.getUnit());
-                // We default to a generic category (e.g., Category 1) if we don't know it yet
-                newProduct.setCategoryId(1L);
+                newProduct.setCategoryId(item.getCategoryId()); // Using ID sent from Android
 
-                // Save it to MySQL to generate a real product_id
+                // Set initial price if provided
+                if (item.getProductPrice() != null) {
+                    newProduct.setPrice(item.getProductPrice());
+                }
+
                 Product savedProduct = productRepository.save(newProduct);
-
-                // Assign that brand new ID to our shopping list item
                 item.setProductId(savedProduct.getProductId());
             }
         }
 
-        // 4. Clean up the shopId (if they selected "Anywhere" / 0, set to null so DB is happy)
+        // 2. Update the Global Product Price
+        // This ensures the "current price" in the Products table is always up-to-date
+        productRepository.findById(item.getProductId()).ifPresent(product -> {
+            if (item.getProductPrice() != null) {
+                product.setPrice(item.getProductPrice());
+                productRepository.save(product);
+            }
+        });
+
+        // 3. Clean up shopId (0 means "Anywhere", maps to null in DB)
         if (item.getShopId() != null && item.getShopId() == 0L) {
             item.setShopId(null);
         }
 
-        // 5. Finally, save the row to the ShoppingListItems table!
         return itemRepository.save(item);
     }
 
-    // --- YOUR EXISTING FETCH METHOD ---
+    /**
+     * Fetches the full list and attaches the latest product names and prices
+     * from the Products table to the transient fields.
+     */
     public ShoppingListResponseDTO getFullShoppingList(Long listId) {
         ShoppingList list = listRepository.findById(listId)
                 .orElseThrow(() -> new RuntimeException("Shopping List not found"));
 
         List<ShoppingListItem> items = itemRepository.findByListId(listId);
 
+        // Map the product information (Name and Price) to each item
         for (ShoppingListItem item : items) {
             productRepository.findById(item.getProductId()).ifPresent(product -> {
                 item.setProductName(product.getName());
+                item.setProductPrice(product.getPrice()); // Pull price from Products table
             });
         }
 
         return new ShoppingListResponseDTO(list, items);
     }
+
     public void toggleItemStatus(Long itemId, Boolean isPurchased) {
         ShoppingListItem item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
         item.setPurchased(isPurchased);
         itemRepository.save(item);
+    }
+
+    public List<ShoppingList> getAllLists() {
+        return listRepository.findAll();
+    }
+
+    public ShoppingList createList(ShoppingList newList) {
+        if (newList.getList_id() != null && newList.getList_id() == 0L) {
+            newList.setList_id(null);
+        }
+        if (newList.getUserId() == null) {
+            newList.setUserId(1L); // Default user
+        }
+        newList.setStatus("active");
+        return listRepository.save(newList);
     }
 }

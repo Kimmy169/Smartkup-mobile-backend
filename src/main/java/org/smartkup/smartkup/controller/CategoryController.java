@@ -1,7 +1,11 @@
 package org.smartkup.smartkup.controller;
 
 import org.smartkup.smartkup.entity.Category;
+import org.smartkup.smartkup.entity.PantryItem;
 import org.smartkup.smartkup.repository.CategoryRepository;
+import org.smartkup.smartkup.repository.PantryItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,21 +14,33 @@ import java.util.List;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    private final CategoryRepository repository;
+    @Autowired
+    private PantryItemRepository pantryItemRepository;
 
-    public CategoryController(CategoryRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    // This is the exact endpoint Android is trying to call!
     @GetMapping
-    public List<Category> getAllCategories() {
-        return repository.findAll();
+    public ResponseEntity<List<Category>> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        if (categories.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(categories);
     }
 
-    // Allows you to add categories via API if needed later
-    @PostMapping
-    public Category createCategory(@RequestBody Category category) {
-        return repository.save(category);
+    @GetMapping("/{categoryId}/pantry-items")
+    public ResponseEntity<List<PantryItem>> getPantryItemsByCategory(@PathVariable Long categoryId) {
+
+        // Update this line to call the newly named method
+        List<PantryItem> items = pantryItemRepository.findByProduct_CategoryId(categoryId);
+
+        if (items.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(items);
     }
+
+
 }

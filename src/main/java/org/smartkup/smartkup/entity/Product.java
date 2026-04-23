@@ -21,4 +21,7 @@ public class Product {
 
     @Column(name = "default_unit")
     private String defaultUnit;
+
+    @Column(name = "price")
+    private java.math.BigDecimal price;
 }
