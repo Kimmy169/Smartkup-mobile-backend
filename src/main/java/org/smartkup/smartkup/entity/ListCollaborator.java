@@ -24,7 +24,7 @@ public class ListCollaborator {
     private Long userId;
 
     @Column(length = 20)
-    private String role = "editor"; // Default role
+    private String role = "editor";
 
     @Column(name = "added_at", insertable = false, updatable = false)
     private LocalDateTime addedAt;

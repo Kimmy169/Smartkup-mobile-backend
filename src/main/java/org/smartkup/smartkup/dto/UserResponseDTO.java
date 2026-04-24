@@ -11,7 +11,6 @@ public class UserResponseDTO {
     private String email;
     private LocalDateTime createdAt;
 
-    // Constructor to easily convert an Entity into a safe DTO
     public UserResponseDTO(User user) {
         this.userId = user.getUser_id();
         this.username = user.getUsername();

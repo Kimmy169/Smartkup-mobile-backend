@@ -32,7 +32,6 @@ public class CategoryController {
     @GetMapping("/{categoryId}/pantry-items")
     public ResponseEntity<List<PantryItem>> getPantryItemsByCategory(@PathVariable Long categoryId) {
 
-        // Update this line to call the newly named method
         List<PantryItem> items = pantryItemRepository.findByProduct_CategoryId(categoryId);
 
         if (items.isEmpty()) {

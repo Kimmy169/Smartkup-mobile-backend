@@ -27,19 +27,15 @@ public class ShoppingListService {
         this.productRepository = productRepository;
     }
 
-    /**
-     * Adds an item to a list. If the product is new, it creates it.
-     * It also updates the global price in the Products table.
-     */
     public ShoppingListItem addItemToList(ShoppingListItem item) {
-        // Reset ID if it comes as 0 from Android to allow auto-generation
+
         if (item.getList_item_id() != null && item.getList_item_id() == 0L) {
             item.setList_item_id(null);
         }
 
-        // 1. Resolve the Product (Create if custom name was typed)
         if (item.getProductId() == null || item.getProductId() == 0L) {
             String customName = item.getProductName();
+
             if (customName == null || customName.trim().isEmpty()) {
                 throw new IllegalArgumentException("Product name cannot be empty for new products!");
             }
@@ -52,9 +48,8 @@ public class ShoppingListService {
                 Product newProduct = new Product();
                 newProduct.setName(customName.trim());
                 newProduct.setDefaultUnit(item.getUnit());
-                newProduct.setCategoryId(item.getCategoryId()); // Using ID sent from Android
+                newProduct.setCategoryId(item.getCategoryId());
 
-                // Set initial price if provided
                 if (item.getProductPrice() != null) {
                     newProduct.setPrice(item.getProductPrice());
                 }
@@ -64,8 +59,6 @@ public class ShoppingListService {
             }
         }
 
-        // 2. Update the Global Product Price
-        // This ensures the "current price" in the Products table is always up-to-date
         productRepository.findById(item.getProductId()).ifPresent(product -> {
             if (item.getProductPrice() != null) {
                 product.setPrice(item.getProductPrice());
@@ -73,7 +66,6 @@ public class ShoppingListService {
             }
         });
 
-        // 3. Clean up shopId (0 means "Anywhere", maps to null in DB)
         if (item.getShopId() != null && item.getShopId() == 0L) {
             item.setShopId(null);
         }
@@ -81,21 +73,16 @@ public class ShoppingListService {
         return itemRepository.save(item);
     }
 
-    /**
-     * Fetches the full list and attaches the latest product names and prices
-     * from the Products table to the transient fields.
-     */
     public ShoppingListResponseDTO getFullShoppingList(Long listId) {
         ShoppingList list = listRepository.findById(listId)
                 .orElseThrow(() -> new RuntimeException("Shopping List not found"));
 
         List<ShoppingListItem> items = itemRepository.findByListId(listId);
 
-        // Map the product information (Name and Price) to each item
         for (ShoppingListItem item : items) {
             productRepository.findById(item.getProductId()).ifPresent(product -> {
                 item.setProductName(product.getName());
-                item.setProductPrice(product.getPrice()); // Pull price from Products table
+                item.setProductPrice(product.getPrice());
             });
         }
 
@@ -118,7 +105,7 @@ public class ShoppingListService {
             newList.setList_id(null);
         }
         if (newList.getUserId() == null) {
-            newList.setUserId(1L); // Default user
+            newList.setUserId(1L);
         }
         newList.setStatus("active");
         return listRepository.save(newList);

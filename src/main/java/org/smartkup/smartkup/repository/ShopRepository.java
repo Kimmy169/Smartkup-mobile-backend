@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-    // Allows the app to fetch only the shops created by the logged-in user
     List<Shop> findByUserId(Long userId);
 }

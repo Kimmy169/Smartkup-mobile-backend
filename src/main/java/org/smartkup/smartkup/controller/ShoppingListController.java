@@ -19,7 +19,6 @@ public class ShoppingListController {
         this.service = service;
     }
 
-    // 1. The GET endpoint (you already have this)
     @GetMapping("/{listId}")
     public ResponseEntity<ShoppingListResponseDTO> getFullList(@PathVariable Long listId) {
         try {
@@ -30,7 +29,6 @@ public class ShoppingListController {
         }
     }
 
-    // 2. THE MISSING POST ENDPOINT (Add this!)
     @PostMapping("/items")
     public ResponseEntity<ShoppingListItem> addItem(@RequestBody ShoppingListItem item) {
         try {
@@ -58,7 +56,6 @@ public class ShoppingListController {
         return ResponseEntity.ok(service.getAllLists());
     }
 
-    // Handles POST /api/shopping-lists
     @PostMapping
     public ResponseEntity<ShoppingList> createList(@RequestBody ShoppingList list) {
         return ResponseEntity.ok(service.createList(list));

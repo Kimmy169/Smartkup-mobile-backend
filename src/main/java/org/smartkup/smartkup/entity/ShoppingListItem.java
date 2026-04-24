@@ -1,6 +1,6 @@
 package org.smartkup.smartkup.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty; // 1. ADD THIS IMPORT
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -25,7 +25,6 @@ public class ShoppingListItem {
     private BigDecimal quantity;
     private String unit;
 
-    // 2. ADD THIS ANNOTATION
     @JsonProperty("isPurchased")
     @Column(name = "is_purchased")
     private Boolean purchased;
@@ -34,7 +33,7 @@ public class ShoppingListItem {
     private String productName;
 
     @Transient
-    @com.fasterxml.jackson.annotation.JsonProperty("categoryId") // This forces Jackson to map it correctly
+    @com.fasterxml.jackson.annotation.JsonProperty("categoryId")
     private Long categoryId;
 
     @Transient

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Table(name = "Products")
-@Data // This Lombok annotation is the magic that creates getName(), setName(), etc.
+@Data
 public class Product {
 
     @Id

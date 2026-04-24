@@ -17,25 +17,21 @@ public class RecipeController {
         this.service = service;
     }
 
-    // Create the base recipe
     @PostMapping
     public Recipe createRecipe(@RequestBody Recipe recipe) {
         return service.createRecipe(recipe);
     }
 
-    // Add an ingredient to a recipe
     @PostMapping("/ingredients")
     public RecipeIngredient addIngredient(@RequestBody RecipeIngredient ingredient) {
         return service.addIngredient(ingredient);
     }
 
-    // Add a step to a recipe
     @PostMapping("/steps")
     public RecipeStep addStep(@RequestBody RecipeStep step) {
         return service.addStep(step);
     }
 
-    // Get the fully bundled recipe
     @GetMapping("/{recipeId}")
     public RecipeResponseDTO getFullRecipe(@PathVariable Long recipeId) {
         return service.getFullRecipe(recipeId);

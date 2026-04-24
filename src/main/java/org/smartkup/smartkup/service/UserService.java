@@ -16,13 +16,10 @@ public class UserService {
 
     // Register a new user
     public UserResponseDTO registerUser(User user) {
-        // In a real app, you would hash the password here before saving!
-        // For now, we will just save the raw entity.
         User savedUser = repository.save(user);
         return new UserResponseDTO(savedUser);
     }
 
-    // Fetch a user profile safely (without password)
     public UserResponseDTO getUserProfile(Long userId) {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface RecipeStepRepository extends JpaRepository<RecipeStep, Long> {
-    // Automatically sorts the steps by stepNumber!
     List<RecipeStep> findByRecipeIdOrderByStepNumberAsc(Long recipeId);
 }

@@ -14,17 +14,15 @@ public class PantryItem {
     @Column(name = "pantry_item_id")
     private Long pantryItemId;
 
-    // Links to your Users table
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Links to your Products table (which holds the Name and Category!)
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private BigDecimal quantity; // decimal(10,2) matches perfectly to BigDecimal
+    private BigDecimal quantity;
 
     private String unit;
 
@@ -34,10 +32,8 @@ public class PantryItem {
     @Column(name = "added_at")
     private LocalDateTime addedAt;
 
-    // --- Empty Constructor for Spring Boot ---
     public PantryItem() {}
 
-    // --- Getters and Setters ---
     public Long getPantryItemId() { return pantryItemId; }
     public void setPantryItemId(Long pantryItemId) { this.pantryItemId = pantryItemId; }
 

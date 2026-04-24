@@ -8,7 +8,5 @@ import java.util.List;
 
 @Repository
 public interface PantryItemRepository extends JpaRepository<PantryItem, Long> {
-
-    // Changed "Category_Id" to "CategoryId" to match your Product entity!
     List<PantryItem> findByProduct_CategoryId(Long categoryId);
 }

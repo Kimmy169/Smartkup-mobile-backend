@@ -16,19 +16,16 @@ public class ListCollaboratorController {
         this.repository = repository;
     }
 
-    // See who is collaborating on a list
     @GetMapping("/list/{listId}")
     public List<ListCollaborator> getCollaboratorsForList(@PathVariable Long listId) {
         return repository.findByListId(listId);
     }
 
-    // See what lists a user is collaborating on
     @GetMapping("/user/{userId}")
     public List<ListCollaborator> getSharedListsForUser(@PathVariable Long userId) {
         return repository.findByUserId(userId);
     }
 
-    // Invite a new user to a list
     @PostMapping
     public ListCollaborator addCollaborator(@RequestBody ListCollaborator collaborator) {
         return repository.save(collaborator);
